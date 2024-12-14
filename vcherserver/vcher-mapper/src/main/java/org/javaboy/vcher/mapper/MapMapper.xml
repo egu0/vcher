@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.javaboy.vcher.mapper.MapMapper" >
+
+<!--
+    id          int auto_increment primary key comment '记录ID',
+    remark      varchar(1000) not null default '' comment '地图备注',
+    hr_id       int           not null comment '地图添加者',
+    zoom        int           not null default 17 comment '地图缩放等级',
+    lat         char(30)      not null default '116.2550699295006' comment '中心点的纬度，默认CUP',
+    lng         char(30)      not null default '40.225234327805275' comment '中心点的经度，默认CUP',
+    data        text          not null comment '地图覆盖层的JSON数据，包括标注点及其标注的信息等',
+    insert_time datetime      null comment '添加时间',
+    update_time datetime      null comment '更新时间',
+    is_deleted  tinyint       not null default 0 comment '做逻辑删除'
+-->
+    <resultMap id="BaseResultMap" type="org.javaboy.vcher.model.Map">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="hr_id" property="hrId" jdbcType="INTEGER"/>
+        <result column="hr_name" property="hrName" jdbcType="VARCHAR"/>
+        <result column="data" property="data" jdbcType="VARCHAR"/>
+        <result column="zoom" property="zoom" jdbcType="INTEGER"/>
+        <result column="lat" property="lat" jdbcType="VARCHAR"/>
+        <result column="lng" property="lng" jdbcType="VARCHAR"/>
+        <result column="insert_time" property="insertTime" jdbcType="DATE"/>
+        <result column="update_time" property="updateTime" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, remark, hr_id, zoom, lat, lng, `data`, insert_time, update_time, is_deleted
+    </sql>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        mp.*, hr.name hr_name
+        from map_poi mp, hr
+        where mp.hr_id = hr.id and is_deleted = 0
+        <if test="keyword != null">
+            and mp.remark like concat('%',#{keyword},'%')
+        </if>
+        <if test="page != null and size != null">
+            limit #{page}, #{size}
+        </if>
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Long">
+        select count(*)
+        from map_poi
+        where is_deleted = 0
+        <if test="keyword != null">
+            and remark like concat('%',#{keyword},'%')
+        </if>
+    </select>
+
+    <select id="getOneById" resultType="org.javaboy.vcher.model.Map">
+        select
+            mp.*, hr.name hr_name
+        from map_poi mp, hr
+        where mp.hr_id = hr.id and is_deleted = 0 and mp.id = #{id}
+    </select>
+
+    <insert id="insertOne">
+        insert into map_poi (remark, hr_id, zoom, lat, lng, `data`, insert_time, update_time)
+        values(#{remark}, #{hrId}, #{zoom}, #{lat}, #{lng}, #{data}, #{insertTime} ,#{updateTime})
+    </insert>
+
+    <update id="updateOne">
+        update map_poi set remark=#{remark}, zoom=#{zoom}, update_time=#{updateTime},
+                             lat=#{lat}, lng=#{lng}, `data`=#{data}
+        where id=#{id} and is_deleted = 0
+    </update>
+
+    <update id="deleteById">
+        update map_poi set is_deleted = 1 where id = #{id} and is_deleted = 0
+    </update>
+</mapper>

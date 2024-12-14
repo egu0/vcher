@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.javaboy.vcher.mapper.StudyProgressMapper">
+
+    <resultMap id="BaseResultMap" type="org.javaboy.vcher.model.StudyProgress">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="hr_id" property="hrId" jdbcType="INTEGER" />
+        <result column="hr_name" property="hrName" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="t_date" property="tDate" jdbcType="DATE"/>
+        <result column="t_progress" property="tProgress" jdbcType="INTEGER"/>
+        <result column="last_update_time" property="lastUpdateTime" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, hr_id, t_date, t_progress, last_update_time
+    </sql>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        sp.*, hr.name hr_name
+        from study_progress sp, hr
+        where sp.hr_id = hr.id
+        <if test="keyword != null">
+            and sp.remark like concat('%',#{keyword},'%')
+        </if>
+        order by t_date desc
+        <if test="page != null and size != null">
+            limit #{page}, #{size}
+        </if>
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Long">
+        select count(*)
+        from study_progress
+        <if test="keyword != null">
+            where remark like concat('%',#{keyword},'%')
+        </if>
+    </select>
+
+    <insert id="insertOne">
+        insert into study_progress (t_date, t_progress,hr_id, remark, last_update_time)
+        values(#{tDate}, #{tProgress}, #{hrId}, #{remark}, #{lastUpdateTime})
+    </insert>
+
+    <update id="updateOne">
+        update study_progress set t_progress=#{tProgress}, remark=#{remark},
+                                  last_update_time=#{lastUpdateTime}
+                        where id=#{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from study_progress where id = #{id}
+    </delete>
+
+</mapper>

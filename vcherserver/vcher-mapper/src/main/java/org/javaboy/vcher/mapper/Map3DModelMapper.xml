@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.javaboy.vcher.mapper.Map3DModelMapper">
+
+    <resultMap id="BaseResultMap" type="org.javaboy.vcher.model.ThreeDModel">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="type_name" property="typeName" jdbcType="VARCHAR" />
+        <result column="type_desp" property="typeDesp" jdbcType="VARCHAR" />
+        <result column="desp" property="desp" jdbcType="VARCHAR"/>
+        <result column="src" property="src" jdbcType="VARCHAR"/>
+        <result column="mtl" property="mtl" jdbcType="VARCHAR"/>
+        <result column="dir_name" property="dirName" jdbcType="VARCHAR"/>
+        <result column="hr_id" property="hrId" jdbcType="INTEGER" />
+        <result column="hr_name" property="hrName" jdbcType="VARCHAR"/>
+        <result column="insert_time" property="insertTime" jdbcType="DATE"/>
+        <result column="update_time" property="updateTime" jdbcType="DATE"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="INTEGER" />
+    </resultMap>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        select
+        m3d.*, hr.name hr_name, mtype.type type_name, mtype.desp type_desp
+        from map_3d m3d, hr, three_d_models_type mtype
+        where
+              m3d.hr_id = hr.id and m3d.type = mtype.id
+                and m3d.is_deleted = 0
+                and mtype.is_deleted = 0
+        <if test="keyword != null">
+            and m3d.desp like concat('%',#{keyword},'%')
+        </if>
+        <if test="page != null and size != null">
+            limit #{page}, #{size}
+        </if>
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Long">
+        select count(*)
+        from map_3d
+        where is_deleted = 0
+        <if test="keyword != null">
+            and desp like concat('%',#{keyword},'%')
+        </if>
+    </select>
+
+    <insert id="insertOne">
+        insert into map_3d (type, desp, src, mtl, dir_name, hr_id, insert_time, update_time)
+        values (#{type}, #{desp}, #{src}, #{mtl}, #{dirName}, #{hrId}, #{insertTime}, #{updateTime})
+    </insert>
+
+    <update id="updateOne">
+        update map_3d set type=#{type}, desp=#{desp}, dir_name=#{dirName}, src=#{src}, mtl=#{mtl}, update_time=#{updateTime}
+        where id=#{id} and is_deleted=0
+    </update>
+
+    <update id="deleteById">
+        update map_3d set is_deleted = 1
+        where id=#{id} and is_deleted=0
+    </update>
+
+</mapper>

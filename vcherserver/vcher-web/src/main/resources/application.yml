@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: mysql8
+    url: jdbc:mysql://localhost:3306/mvhr?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+  rabbitmq:
+    username: guest
+    password: guest
+    host: 127.0.0.1
+    publisher-confirms: true
+    publisher-returns: true
+  redis:
+    host: 127.0.0.1
+    database: 0
+    port: 6379
+    password: redson
+  cache:
+    cache-names: menus_cache
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+      enabled: true
+server:
+  port: 8081
+  compression:
+    enabled: true
+proj:
+  host: http://localhost
